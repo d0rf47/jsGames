@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+
+  <body>
+    <div id="homeScreen">
+      <div class="startTxt">
+        <h2>Press Spacebar To Begin the Game</h2>
+      </div>
+    </div>
+    <div class="gameWrapper invis">
+      <canvas id="gameScreen" width="800" height="600"> </canvas>
+
+      <div id="scoreBoard">
+        <div id="scoreList">
+          <p>Level: <span id="level">1</span></p>
+          <p>Score: <span id="score">0</span></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="src/index.js"></script>
+  </body>
+</html>
