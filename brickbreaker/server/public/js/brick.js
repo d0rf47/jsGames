@@ -9,7 +9,7 @@ export default class Brick {
   };
 
   constructor(gameObj, row, drawable) {
-    this.src.src = "src/assets/brick.webp";
+    this.src.src = "../assets/brick.webp";
     this.game = gameObj;
     this.row = row;
     this.drawable = drawable;

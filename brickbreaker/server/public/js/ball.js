@@ -18,7 +18,7 @@ export default class Ball {
     this.speed.y = this.maxSpeedY;
     this.position.y = gameObj.height - this.src.height - 30;
     this.position.x = gameObj.width / 2 - this.src.width / 2;
-    this.src.src = "src/assets/ball.webp";
+    this.src.src = "../assets/ball.webp";
     this.src.onload = () => {
       this.draw();
     };

@@ -27,34 +27,50 @@ export default class Game {
   }
 
   init() {
-    document.getElementById("homeScreen").classList.add("invis");
-    document.querySelector(".gameWrapper").classList.remove("invis");
-    this.start();
-    this.gameState = "play";
+    if(this.gameState === 'stop')
+    {
+      document.getElementById("homeScreen").classList.add("invis");
+      document.querySelector(".gameWrapper").classList.remove("invis");
+      this.start();
+      this.gameState = "play";
+    }
+    
   }
-  start() {
+  start() 
+  {
+    if(this.currLevel === this.levels.length)
+    {
+      this.gameState = 'stop'
+      if(window.confirm(`GAME OVER Final Score: ${this.score}`))
+        this.reset();
+      
+      return;
+    }
     this.maxSpeed = this.levels[this.currLevel].ballSpeed;
     this.paddle = new Paddle(this);
     this.ball = new Ball(this);
     this.initBricks();
   }
 
-  control() {
-    switch (this.gameState) {
+  control() 
+  {
+    switch (this.gameState) 
+    {
       case "play":
         this.update();
         break;
       case "pause":
         this.ball.stop();
         break;
-      case "stop":
+      case "stop":        
         break;
       default:
         break;
     }
   }
   //add switch for game state
-  update() {
+  update() 
+  {
     if (this.maxScore === this.score) {
       this.nextLevel();
     } else {
@@ -65,7 +81,8 @@ export default class Game {
     }
   }
 
-  initBricks() {
+  initBricks() 
+  {
     for (let i = 0; i < this.levels[this.currLevel].bricks.length; i++) {
       this.levels[this.currLevel].bricks[i].forEach((br) => {
         if (br === 1) {
@@ -78,15 +95,22 @@ export default class Game {
     }
   }
 
-  updateScore() {
+  updateScore() 
+  {
     document.getElementById("score").innerHTML = this.score;
   }
 
-  nextLevel() {
+  nextLevel() 
+  {
     this.currLevel++;
-    document.getElementById("level").innerHTML = this.currLevel;
+    document.getElementById("level").innerHTML = this.currLevel + 1;
     this.bricks = [];
     this.start();
     this.gameState = "pause";
+  }
+
+  reset()
+  {
+
   }
 }

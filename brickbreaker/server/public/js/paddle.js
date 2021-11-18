@@ -17,7 +17,7 @@ export default class Paddle {
     this.height = 120;
     this.position.y = gameObj.height - this.height + 50;
     this.position.x = gameObj.width / 2 - this.width / 2;
-    this.src.src = "src/assets/paddle.webp";
+    this.src.src = "../assets/paddle.webp";
     this.src.onload = () => {
       gameObj.ctx.drawImage(this.src, this.position.x, this.position.y);
     };
