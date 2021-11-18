@@ -1,0 +1,33 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+.light
+{
+    color:#7986cb !important;
+}
+
+.dark
+{
+    color: black;
+}
+
+.black
+{
+    background-color: #4527a0;
+    color: whitesmoke;
+}
+
+.fas
+{
+    cursor: pointer;    
+}
+
+
+.overlay-effect {    
+    transition: .5s ease;
+    background-color: rgba(259, 67, 95, 0.7);    
+  }

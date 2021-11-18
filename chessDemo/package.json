@@ -1,0 +1,47 @@
+{
+  "name": "chessdemo",
+  "version": "1.0.0",
+  "description": "vanilla js chess demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "npm run prod",
+    "build": "npm-run-all clean transpile",
+    "server": "node ./server/server",
+    "dev": "SET NODE_ENV=development && npm-run-all build server",
+    "prod": "SET NODE_ENV=production && npm-run-all build server",
+    "transpile": "webpack ./server/public/js",
+    "clean": "rimraf server/public/dist"
+  },
+  "author": "Michael Falconi",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/runtime": "^7.15.4",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.4"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.15.8",
+    "@babel/preset-env": "7.13.8",
+    "babel-loader": "^8.2.3",
+    "nodemon": "^2.0.14",
+    "rimraf": "^3.0.2",
+    "webpack": "^5.61.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.4.0"
+  },
+  "keywords": [
+    "javascript",
+    "starter"
+  ],
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ]
+  }
+}
