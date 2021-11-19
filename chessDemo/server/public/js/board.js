@@ -16,6 +16,7 @@ export default class Board {
     let x = 0;    
     for (let i = 0; i < 64; i++) {      
     
+      tiles[i].setAttribute('data-index', `${j},${x}`);
       this.tiles[j][x] =
       {
         location : tiles[i].attributes.id.nodeValue,
@@ -109,8 +110,6 @@ export default class Board {
         x = 0;
       }                  
     }   
-  }
-
-  locatePiece
+  }  
 }
 
