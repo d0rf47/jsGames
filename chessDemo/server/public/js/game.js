@@ -51,10 +51,13 @@ export default class Game
         if(piece.color === 'light')
             verTMovement = -1;            
 
-        if(!this.board.tiles[row + verTMovement][col].occupied)
+        if(!this.board.tiles[row + verTMovement][col].occupied || (this.board.tiles[row + verTMovement][col].occupied &&
+            this.board.tiles[tile.index.row + verTMovement][tile.index.col].element.children[0].getAttribute('data-team') !== piece.color))
         {            
-            if(!piece.moved)            
-                potentialMoves.push({row: row + verTMovement + verTMovement, col: col});            
+            if(!piece.moved && !this.board.tiles[row + verTMovement * 2][col].occupied || (this.board.tiles[row + verTMovement * 2][col].occupied &&
+                this.board.tiles[tile.index.row + verTMovement * 2][tile.index.col].element.children[0].getAttribute('data-team') !== piece.color))       
+                potentialMoves.push({row: row + verTMovement * 2, col: col});            
+
             potentialMoves.push({row: row + verTMovement, col: col});
         }            
 
@@ -255,7 +258,7 @@ export default class Game
         //backwards right
         for(let i = 1; i <= 8; i++)
         {
-            if(row + i <= 7 && col - i >=0)
+            if(row + i <= 7 && col + i <= 7)
             {                
                 if(this.board.tiles[row + i][col + i].occupied && this.board.tiles[row + i][col + i].element.children[0].getAttribute('data-team') === piece.color)
                     break;
