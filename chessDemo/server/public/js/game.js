@@ -35,6 +35,9 @@ export default class Game
                 case 'bishop':
                     this.checkBishopMove(currPiece);
                     break;
+                case 'knight':
+                    this.checkKnightMove(currPiece);
+                    break;
             }
         }
     }
@@ -191,8 +194,8 @@ export default class Game
     checkBishopMove(piece)
     {
         let tile = this.board.locateTile(piece.position);
-        // console.log("rook piece: ", piece)
-        // console.log("rook tile", tile);
+        // console.log("bishop piece: ", piece)
+        // console.log("bishop tile", tile);
         const row = tile.index.row;
         const col = tile.index.col;
         let potentialMoves = [];         
@@ -274,6 +277,131 @@ export default class Game
             }else
                 break;
         }
+
+        //last thing in method
+        potentialMoves.forEach(m =>
+        {
+            this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
+        });
+        this.potentialMoves = potentialMoves;        
+    }
+
+    //knight moves
+    checkKnightMove(piece)
+    {
+        let tile = this.board.locateTile(piece.position);
+        console.log("knight piece: ", piece)
+        console.log("knight tile", tile);
+        const row = tile.index.row;
+        const col = tile.index.col;
+        let potentialMoves = [];         
+        let verTMovement = 2;
+        let horzMovment = 1;
+
+        //forward check
+        if(row - verTMovement >= 0)
+        {
+            //left check
+            if(col - horzMovment >= 0)
+            {
+                if(!this.board.tiles[row - verTMovement][col - horzMovment].occupied ||
+                    (this.board.tiles[row - verTMovement][col - horzMovment].occupied &&
+                    this.board.tiles[row - verTMovement][col - horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
+                    {
+                        potentialMoves.push({row: row - verTMovement, col : col - horzMovment});
+                    }
+            }
+            //right check
+            if(col + horzMovment <= 7)
+            {
+                if(!this.board.tiles[row - verTMovement][col + horzMovment].occupied ||
+                    (this.board.tiles[row - verTMovement][col + horzMovment].occupied &&
+                    this.board.tiles[row - verTMovement][col + horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
+                    {
+                        potentialMoves.push({row: row - verTMovement, col : col + horzMovment});
+                    }
+            }            
+        }
+
+        //backward check
+        if(row + verTMovement <= 8)
+        {
+            //left check
+            if(col - horzMovment >= 0)
+            {
+                if(!this.board.tiles[row + verTMovement][col - horzMovment].occupied ||
+                    (this.board.tiles[row + verTMovement][col - horzMovment].occupied &&
+                    this.board.tiles[row + verTMovement][col - horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
+                    {
+                        potentialMoves.push({row: row + verTMovement, col : col - horzMovment});
+                    }
+            }
+            //right check
+            if(col + horzMovment <= 7)
+            {
+                if(!this.board.tiles[row + verTMovement][col + horzMovment].occupied ||
+                    (this.board.tiles[row + verTMovement][col + horzMovment].occupied &&
+                    this.board.tiles[row + verTMovement][col + horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
+                    {
+                        potentialMoves.push({row: row + verTMovement, col : col + horzMovment});
+                    }
+            }            
+        }
+
+        //swap horz and vert
+        verTMovement = 1;
+        horzMovment = 2;
+        //left check
+        if(col - horzMovment >= 0)
+        {            
+            //back check
+            if(row - verTMovement >= 0)
+            {                
+                if(!this.board.tiles[row - verTMovement][col - horzMovment].occupied ||
+                    (this.board.tiles[row - verTMovement][col - horzMovment].occupied &&
+                    this.board.tiles[row - verTMovement][col - horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
+                    {
+                        potentialMoves.push({row: row - verTMovement, col : col - horzMovment});
+                    }
+            }            
+            //front check
+            if(row + verTMovement <= 7)
+            {                
+                if(!this.board.tiles[row + verTMovement][col - horzMovment].occupied ||
+                    (this.board.tiles[row + verTMovement][col - horzMovment].occupied &&
+                    this.board.tiles[row + verTMovement][col - horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
+                    {
+                        potentialMoves.push({row: row + verTMovement, col : col - horzMovment});
+                    }
+            }            
+        }
+
+        //right check
+        if(col + horzMovment <= 7)
+        {
+            //back check
+            if(row - verTMovement >= 0)
+            {
+                if(!this.board.tiles[row - verTMovement][col + horzMovment].occupied ||
+                    (this.board.tiles[row - verTMovement][col + horzMovment].occupied &&
+                    this.board.tiles[row - verTMovement][col + horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
+                    {
+                        potentialMoves.push({row: row - verTMovement, col : col + horzMovment});
+                    }
+            }
+            //front check
+            if(row + verTMovement <= 7)
+            {
+                if(!this.board.tiles[row + verTMovement][col + horzMovment].occupied ||
+                    (this.board.tiles[row + verTMovement][col + horzMovment].occupied &&
+                    this.board.tiles[row + verTMovement][col + horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
+                    {
+                        potentialMoves.push({row: row + verTMovement, col : col + horzMovment});
+                    }
+            }            
+        }
+        
+
 
         //last thing in method
         potentialMoves.forEach(m =>
