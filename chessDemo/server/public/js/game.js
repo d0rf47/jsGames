@@ -50,27 +50,26 @@ export default class Game
         const row = tile.index.row;
         const col = tile.index.col;
         let potentialMoves = [];
-        let verTMovement = 1
+        let verTMovement = 1;
+        //check for direction of mvmt
         if(piece.color === 'light')
             verTMovement = -1;            
 
-        if(!this.board.tiles[row + verTMovement][col].occupied || (this.board.tiles[row + verTMovement][col].occupied &&
-            this.board.tiles[tile.index.row + verTMovement][tile.index.col].element.children[0].getAttribute('data-team') !== piece.color))
+        if(!this.board.tiles[row + verTMovement][col].occupied )
         {            
-            if(!piece.moved && !this.board.tiles[row + verTMovement * 2][col].occupied || (this.board.tiles[row + verTMovement * 2][col].occupied &&
-                this.board.tiles[tile.index.row + verTMovement * 2][tile.index.col].element.children[0].getAttribute('data-team') !== piece.color))       
-                potentialMoves.push({row: row + verTMovement * 2, col: col});            
+            if(!piece.moved && !this.board.tiles[row + verTMovement + verTMovement][col].occupied || 
+                (!piece.moved && this.board.tiles[row + verTMovement + verTMovement][col].occupied &&
+                this.board.tiles[tile.index.row + verTMovement + verTMovement][tile.index.col].element.children[0].getAttribute('data-team') !== piece.color))       
+                potentialMoves.push({row: row + verTMovement + verTMovement, col: col});            
 
             potentialMoves.push({row: row + verTMovement, col: col});
         }            
 
         if(col - 1 > -1 && row + verTMovement < 8 && row + verTMovement > -1)
-        {
-            //comes into here for sure
+        {            
             if(this.board.tiles[tile.index.row + verTMovement][tile.index.col - 1 ].occupied &&
                 this.board.tiles[tile.index.row + verTMovement][tile.index.col - 1].element.children[0].getAttribute('data-team') !== piece.color)
-            {
-                console.log('text');
+            {            
                 potentialMoves.push({row: tile.index.row + verTMovement, col : tile.index.col - 1});
             }            
         }        
@@ -79,8 +78,7 @@ export default class Game
             
             if(this.board.tiles[tile.index.row + verTMovement][tile.index.col + 1 ].occupied &&
                 this.board.tiles[tile.index.row + verTMovement][tile.index.col + 1].element.children[0].getAttribute('data-team') !== piece.color)
-            {
-                console.log("text2")
+            {                
                 potentialMoves.push({row: tile.index.row + verTMovement, col : tile.index.col + 1});
             }
         }
@@ -322,7 +320,6 @@ export default class Game
                     }
             }            
         }
-
         //backward check
         if(row + verTMovement <= 8)
         {
@@ -347,7 +344,6 @@ export default class Game
                     }
             }            
         }
-
         //swap horz and vert
         verTMovement = 1;
         horzMovment = 2;
@@ -375,7 +371,6 @@ export default class Game
                     }
             }            
         }
-
         //right check
         if(col + horzMovment <= 7)
         {
@@ -399,10 +394,7 @@ export default class Game
                         potentialMoves.push({row: row + verTMovement, col : col + horzMovment});
                     }
             }            
-        }
-        
-
-
+        }    
         //last thing in method
         potentialMoves.forEach(m =>
         {
