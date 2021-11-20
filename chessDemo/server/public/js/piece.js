@@ -4,6 +4,7 @@ export default class Piece {
     position = "";
     icon = "";    
     moved = false;
+    alive = true;
     constructor(type, position, color) {
       this.position = position;
       this.type = type;

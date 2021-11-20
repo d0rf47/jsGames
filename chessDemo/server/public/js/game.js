@@ -38,6 +38,13 @@ export default class Game
                 case 'knight':
                     this.checkKnightMove(currPiece);
                     break;
+                case 'queen':
+                    this.checkBishopMove(currPiece);
+                    this.checkRookMove(currPiece);
+                    break;
+                case 'king':
+                    this.checkKingMove(currPiece);
+                    break;
             }
         }
     }
@@ -54,44 +61,35 @@ export default class Game
         //check for direction of mvmt
         if(piece.color === 'light')
             verTMovement = -1;            
-
+        
+        //special case for first moves 
         if(!this.board.tiles[row + verTMovement][col].occupied )
         {            
             if(!piece.moved && !this.board.tiles[row + verTMovement + verTMovement][col].occupied || 
                 (!piece.moved && this.board.tiles[row + verTMovement + verTMovement][col].occupied &&
-                this.board.tiles[tile.index.row + verTMovement + verTMovement][tile.index.col].element.children[0].getAttribute('data-team') !== piece.color))       
+                this.board.tiles[row + verTMovement + verTMovement][col].element.children[0].getAttribute('data-team') !== piece.color))       
                 potentialMoves.push({row: row + verTMovement + verTMovement, col: col});            
 
             potentialMoves.push({row: row + verTMovement, col: col});
         }            
 
-        if(col - 1 > -1 && row + verTMovement < 8 && row + verTMovement > -1)
+        if(col - 1 >= 0 && row + verTMovement < 8 && row + verTMovement >= 0)
         {            
-            if(this.board.tiles[tile.index.row + verTMovement][tile.index.col - 1 ].occupied &&
-                this.board.tiles[tile.index.row + verTMovement][tile.index.col - 1].element.children[0].getAttribute('data-team') !== piece.color)
-            {            
-                potentialMoves.push({row: tile.index.row + verTMovement, col : tile.index.col - 1});
-            }            
-        }        
-        if(col + 1 < 8 && row + verTMovement < 8 && row + verTMovement > -1)
+            if(this.canMove(row + verTMovement, col - 1, piece) && this.isOccupied(row + verTMovement, col - 1))
+                potentialMoves.push({row: row + verTMovement, col : col - 1});            
+        };       
+
+        if(col + 1 < 8 && row + verTMovement < 8 && row + verTMovement >= 0)
         {
-            
-            if(this.board.tiles[tile.index.row + verTMovement][tile.index.col + 1 ].occupied &&
-                this.board.tiles[tile.index.row + verTMovement][tile.index.col + 1].element.children[0].getAttribute('data-team') !== piece.color)
-            {                
-                potentialMoves.push({row: tile.index.row + verTMovement, col : tile.index.col + 1});
-            }
-        }
+            if(this.canMove(row + verTMovement, col + 1, piece ) && this.isOccupied(row + verTMovement, col + 1))                        
+                potentialMoves.push({row: tile.index.row + verTMovement, col : col + 1});            
+        };
         potentialMoves.forEach(m =>
         {
           this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
         });
         this.potentialMoves = potentialMoves;
     };
-
-    //need to check from currPos to board edge 
-    // in each direction
-    //check if any tile in path === currPiece team = end of path
 
     checkRookMove(piece)
     {
@@ -107,15 +105,13 @@ export default class Game
         {
             if(row - i >= 0)
             {                
-                if(this.board.tiles[row - i][col].occupied && this.board.tiles[row - i][col].element.children[0].getAttribute('data-team') === piece.color)
+                if(this.isOccupied(row - i,col) && this.board.tiles[row - i][col].element.children[0].getAttribute('data-team') === piece.color)
                     break;
-                
-                if(!this.board.tiles[row - i][col].occupied || (this.board.tiles[row - i][col].occupied && 
-                    this.board.tiles[row - i][col].element.children[0].getAttribute('data-team') !== piece.color))
+                                
+                if(this.canMove(row - i, col, piece))
                 {                    
                     potentialMoves.push({row: row - i, col : col});
-                    if(this.board.tiles[row - i][col].occupied && 
-                        this.board.tiles[row - i][col].element.children[0].getAttribute('data-team') !== piece.color)
+                    if(this.isOccupied(row - i,col))
                         break;
                 }                 
             }else
@@ -126,15 +122,13 @@ export default class Game
         {
             if(row + i <= 7)
             {                
-                if(this.board.tiles[row + i][col].occupied && this.board.tiles[row + i][col].element.children[0].getAttribute('data-team') === piece.color)
+                if(this.isOccupied(row + i,col) && this.board.tiles[row + i][col].element.children[0].getAttribute('data-team') === piece.color)
                     break;
-                
-                if(!this.board.tiles[row + i][col].occupied || (this.board.tiles[row + i][col].occupied && 
-                    this.board.tiles[row + i][col].element.children[0].getAttribute('data-team') !== piece.color))
+                                
+                if(this.canMove(row + i, col, piece))
                 {                    
                     potentialMoves.push({row: row + i, col : col});
-                    if(this.board.tiles[row + i][col].occupied && 
-                        this.board.tiles[row + i][col].element.children[0].getAttribute('data-team') !== piece.color)
+                    if(this.isOccupied(row + i,col))
                         break;
                 }                 
             }else
@@ -145,39 +139,34 @@ export default class Game
         {
             if(col - i >= 0)
             {                
-                if(this.board.tiles[row][col - i].occupied && this.board.tiles[row][col - i].element.children[0].getAttribute('data-team') === piece.color)
+                if(this.isOccupied(row, col - i) && this.board.tiles[row][col - i].element.children[0].getAttribute('data-team') === piece.color)
                     break;
-                
-                if(!this.board.tiles[row][col - i].occupied || (this.board.tiles[row][col - i].occupied && 
-                    this.board.tiles[row][col - i].element.children[0].getAttribute('data-team') !== piece.color))
+                                
+                if(this.canMove(row, col - i, piece))
                 {                    
                     potentialMoves.push({row: row, col : col - i});
-                    if(this.board.tiles[row][col - i].occupied && 
-                        this.board.tiles[row][col - i].element.children[0].getAttribute('data-team') !== piece.color)
+                    if(this.isOccupied(row,col - i))
                         break;
                 }                 
             }else
-                break;                            
+                break;            
         }
-
         //right
         for(let i = 1; i <= 8; i++)
         {
             if(col + i <= 7)
             {                
-                if(this.board.tiles[row][col + i].occupied && this.board.tiles[row][col + i].element.children[0].getAttribute('data-team') === piece.color)
+                if(this.isOccupied(row,col + i) && this.board.tiles[row][col + i].element.children[0].getAttribute('data-team') === piece.color)
                     break;
-                
-                if(!this.board.tiles[row][col + i].occupied || (this.board.tiles[row][col + i].occupied && 
-                    this.board.tiles[row][col + i].element.children[0].getAttribute('data-team') !== piece.color))
+                                
+                if(this.canMove(row, col + i, piece))
                 {                    
                     potentialMoves.push({row: row, col : col + i});
-                    if(this.board.tiles[row][col + i].occupied && 
-                        this.board.tiles[row][col + i].element.children[0].getAttribute('data-team') !== piece.color)
+                    if(this.isOccupied(row,col + i))
                         break;
                 }                 
             }else
-                break;
+                break;            
         }
 
         //last thing in method
@@ -185,7 +174,7 @@ export default class Game
         {
             this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
         });
-        this.potentialMoves = potentialMoves;        
+        this.potentialMoves = this.potentialMoves.concat(potentialMoves);   
     }
 
     //Check Bishop Moves
@@ -203,34 +192,30 @@ export default class Game
         {
             if(row - i >= 0 && col - i >= 0)
             {                
-                if(this.board.tiles[row - i][col- i].occupied && this.board.tiles[row - i][col- i].element.children[0].getAttribute('data-team') === piece.color)
+                if(this.isOccupied(row - i, col - i) && this.board.tiles[row - i][col - i].element.children[0].getAttribute('data-team') === piece.color)
                     break;
-                
-                if(!this.board.tiles[row - i][col- i].occupied || (this.board.tiles[row - i][col- i].occupied && 
-                    this.board.tiles[row - i][col- i].element.children[0].getAttribute('data-team') !== piece.color))
+                                
+                if(this.canMove(row - i, col - i, piece))
                 {                    
                     potentialMoves.push({row: row - i, col : col - i});
-                    if(this.board.tiles[row - i][col- i].occupied && 
-                        this.board.tiles[row - i][col- i].element.children[0].getAttribute('data-team') !== piece.color)
+                    if(this.isOccupied(row - i,col - i))
                         break;
                 }                 
             }else
-                break;            
+                break;      
         }
         //forward right
         for(let i = 1; i <= 8; i++)
         {
             if(row - i >= 0 && col + i <= 7)
             {                
-                if(this.board.tiles[row - i][col + i].occupied && this.board.tiles[row - i][col + i].element.children[0].getAttribute('data-team') === piece.color)
+                if(this.isOccupied(row - i, col + i) && this.board.tiles[row - i][col + i].element.children[0].getAttribute('data-team') === piece.color)
                     break;
-                
-                if(!this.board.tiles[row - i][col + i].occupied || (this.board.tiles[row - i][col + i].occupied && 
-                    this.board.tiles[row - i][col + i].element.children[0].getAttribute('data-team') !== piece.color))
+                                
+                if(this.canMove(row - i, col + i, piece))
                 {                    
                     potentialMoves.push({row: row - i, col : col + i});
-                    if(this.board.tiles[row - i][col + i].occupied && 
-                        this.board.tiles[row - i][col + i].element.children[0].getAttribute('data-team') !== piece.color)
+                    if(this.isOccupied(row - i,col + i))
                         break;
                 }                 
             }else
@@ -241,15 +226,13 @@ export default class Game
         {
             if(row + i <= 7 && col - i >=0)
             {                
-                if(this.board.tiles[row + i][col - i].occupied && this.board.tiles[row + i][col - i].element.children[0].getAttribute('data-team') === piece.color)
+                if(this.isOccupied(row + i, col - i) && this.board.tiles[row + i][col - i].element.children[0].getAttribute('data-team') === piece.color)
                     break;
-                
-                if(!this.board.tiles[row + i][col - i].occupied || (this.board.tiles[row + i][col - i].occupied && 
-                    this.board.tiles[row + i][col - i].element.children[0].getAttribute('data-team') !== piece.color))
+                                
+                if(this.canMove(row + i, col - i, piece))
                 {                    
                     potentialMoves.push({row: row + i, col : col - i});
-                    if(this.board.tiles[row + i][col - i].occupied && 
-                        this.board.tiles[row + i][col - i].element.children[0].getAttribute('data-team') !== piece.color)
+                    if(this.isOccupied(row + i,col - i))
                         break;
                 }                 
             }else
@@ -261,29 +244,25 @@ export default class Game
         {
             if(row + i <= 7 && col + i <= 7)
             {                
-                if(this.board.tiles[row + i][col + i].occupied && this.board.tiles[row + i][col + i].element.children[0].getAttribute('data-team') === piece.color)
+                if(this.isOccupied(row + i, col + i) && this.board.tiles[row + i][col + i].element.children[0].getAttribute('data-team') === piece.color)
                     break;
-                
-                if(!this.board.tiles[row + i][col + i].occupied || (this.board.tiles[row + i][col + i].occupied && 
-                    this.board.tiles[row + i][col + i].element.children[0].getAttribute('data-team') !== piece.color))
+                                
+                if(this.canMove(row + i, col + i, piece))
                 {                    
                     potentialMoves.push({row: row + i, col : col + i});
-                    if(this.board.tiles[row + i][col + i].occupied && 
-                        this.board.tiles[row + i][col + i].element.children[0].getAttribute('data-team') !== piece.color)
+                    if(this.isOccupied(row + i,col + i))
                         break;
                 }                 
             }else
                 break;
         }
-
         //last thing in method
         potentialMoves.forEach(m =>
         {
             this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
         });
-        this.potentialMoves = potentialMoves;        
-    }
-
+        this.potentialMoves = this.potentialMoves.concat(potentialMoves);
+    };
     //knight moves
     checkKnightMove(piece)
     {
@@ -301,23 +280,15 @@ export default class Game
         {
             //left check
             if(col - horzMovment >= 0)
-            {
-                if(!this.board.tiles[row - verTMovement][col - horzMovment].occupied ||
-                    (this.board.tiles[row - verTMovement][col - horzMovment].occupied &&
-                    this.board.tiles[row - verTMovement][col - horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
-                    {
-                        potentialMoves.push({row: row - verTMovement, col : col - horzMovment});
-                    }
+            {                
+                if(this.canMove(row - verTMovement, col - horzMovment, piece))                    
+                    potentialMoves.push({row: row - verTMovement, col : col - horzMovment});                    
             }
             //right check
             if(col + horzMovment <= 7)
             {
-                if(!this.board.tiles[row - verTMovement][col + horzMovment].occupied ||
-                    (this.board.tiles[row - verTMovement][col + horzMovment].occupied &&
-                    this.board.tiles[row - verTMovement][col + horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
-                    {
-                        potentialMoves.push({row: row - verTMovement, col : col + horzMovment});
-                    }
+                if(this.canMove(row - verTMovement, col + horzMovment, piece))                                
+                    potentialMoves.push({row: row - verTMovement, col : col + horzMovment});                    
             }            
         }
         //backward check
@@ -326,22 +297,14 @@ export default class Game
             //left check
             if(col - horzMovment >= 0)
             {
-                if(!this.board.tiles[row + verTMovement][col - horzMovment].occupied ||
-                    (this.board.tiles[row + verTMovement][col - horzMovment].occupied &&
-                    this.board.tiles[row + verTMovement][col - horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
-                    {
-                        potentialMoves.push({row: row + verTMovement, col : col - horzMovment});
-                    }
+                if(this.canMove(row + verTMovement, col - horzMovment, piece))                    
+                    potentialMoves.push({row: row + verTMovement, col : col - horzMovment});                    
             }
             //right check
             if(col + horzMovment <= 7)
             {
-                if(!this.board.tiles[row + verTMovement][col + horzMovment].occupied ||
-                    (this.board.tiles[row + verTMovement][col + horzMovment].occupied &&
-                    this.board.tiles[row + verTMovement][col + horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
-                    {
-                        potentialMoves.push({row: row + verTMovement, col : col + horzMovment});
-                    }
+                if(this.canMove(row + verTMovement, col + horzMovment, piece))                                    
+                    potentialMoves.push({row: row + verTMovement, col : col + horzMovment});                    
             }            
         }
         //swap horz and vert
@@ -353,22 +316,14 @@ export default class Game
             //back check
             if(row - verTMovement >= 0)
             {                
-                if(!this.board.tiles[row - verTMovement][col - horzMovment].occupied ||
-                    (this.board.tiles[row - verTMovement][col - horzMovment].occupied &&
-                    this.board.tiles[row - verTMovement][col - horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
-                    {
-                        potentialMoves.push({row: row - verTMovement, col : col - horzMovment});
-                    }
+                if(this.canMove(row - verTMovement, col - horzMovment, piece))                                    
+                    potentialMoves.push({row: row - verTMovement, col : col - horzMovment});                    
             }            
             //front check
             if(row + verTMovement <= 7)
             {                
-                if(!this.board.tiles[row + verTMovement][col - horzMovment].occupied ||
-                    (this.board.tiles[row + verTMovement][col - horzMovment].occupied &&
-                    this.board.tiles[row + verTMovement][col - horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
-                    {
-                        potentialMoves.push({row: row + verTMovement, col : col - horzMovment});
-                    }
+                if(this.canMove(row + verTMovement, col - horzMovment, piece))                                    
+                    potentialMoves.push({row: row + verTMovement, col : col - horzMovment});                    
             }            
         }
         //right check
@@ -377,24 +332,38 @@ export default class Game
             //back check
             if(row - verTMovement >= 0)
             {
-                if(!this.board.tiles[row - verTMovement][col + horzMovment].occupied ||
-                    (this.board.tiles[row - verTMovement][col + horzMovment].occupied &&
-                    this.board.tiles[row - verTMovement][col + horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
-                    {
-                        potentialMoves.push({row: row - verTMovement, col : col + horzMovment});
-                    }
+                if(this.canMove(row - verTMovement, col + horzMovment, piece))                                    
+                    potentialMoves.push({row: row - verTMovement, col : col + horzMovment});                    
             }
             //front check
             if(row + verTMovement <= 7)
             {
-                if(!this.board.tiles[row + verTMovement][col + horzMovment].occupied ||
-                    (this.board.tiles[row + verTMovement][col + horzMovment].occupied &&
-                    this.board.tiles[row + verTMovement][col + horzMovment].element.children[0].getAttribute('data-team') !== piece.color) )
-                    {
-                        potentialMoves.push({row: row + verTMovement, col : col + horzMovment});
-                    }
+                if(this.canMove(row + verTMovement, col + horzMovment, piece))                                    
+                    potentialMoves.push({row: row + verTMovement, col : col + horzMovment});                    
             }            
         }    
+        //last thing in method
+        potentialMoves.forEach(m =>
+        {
+            this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
+        });
+        this.potentialMoves = potentialMoves;        
+    };
+
+    //king
+    checkKingMove(piece)
+    {
+        let tile = this.board.locateTile(piece.position);
+        console.log("king piece: ", piece)
+        console.log("king tile", tile);
+        const row = tile.index.row;
+        const col = tile.index.col;
+        let potentialMoves = [];   
+
+        //forward check
+
+
+
         //last thing in method
         potentialMoves.forEach(m =>
         {
@@ -437,8 +406,14 @@ export default class Game
         this.lightTurn = !this.lightTurn;
     }
 
+    //need to update arrays of positions for pieces and track is still on board
     updatePositions(targetElement, piece)
     {
+
+        //add method to check all peiece per team
+        //will need check for king stalemate
+
+        //move board check to own method
         console.log('updating pos', piece);
         console.log(targetElement, piece);
         let j = 0;
@@ -529,5 +504,18 @@ export default class Game
             return false;
 
         return true;
-    }
+    };
+
+    isOccupied(row,col)
+    {
+        return this.board.tiles[row][col].occupied;
+    };
+
+    canMove(row, col, piece)
+    {
+        if(!this.isOccupied(row,col) || (this.isOccupied(row,col) && 
+            this.board.tiles[row][col].element.children[0].getAttribute('data-team') !== piece.color))
+            return true;
+        return false;
+    };
 }
