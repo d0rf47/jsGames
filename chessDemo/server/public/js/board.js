@@ -43,26 +43,26 @@ export default class Board {
     for(let i = 1; i <= 8; i++) 
     {
         let pos = 2 + String.fromCharCode(ascii);
-        let piece = new Piece('pawn', pos, "light");
+        let piece = new Piece('pawn', pos, "light", {row: 6, col: i -1});
         this.lightPieces.push(piece);
         this.tiles[1][i-1].occupied = true;
         ascii++;
     }
-    this.lightPieces.push(new Piece('rook', "1a" ,"light"));
+    this.lightPieces.push(new Piece('rook', "1a" ,"light" , {row: 7, col: 0}));
     this.tiles[0][0].occupied = true;
-    this.lightPieces.push(new Piece('rook', "1h" ,"light"));
+    this.lightPieces.push(new Piece('rook', "1h" ,"light" , {row: 7, col: 7}));
     this.tiles[0][7].occupied = true;
-    this.lightPieces.push(new Piece('knight', "1b" ,"light"));
+    this.lightPieces.push(new Piece('knight', "1b" ,"light" , {row: 7, col: 1}));
     this.tiles[0][1].occupied = true;
-    this.lightPieces.push(new Piece('knight', "1g" ,"light"));
+    this.lightPieces.push(new Piece('knight', "1g" ,"light" , {row: 7, col: 6}));
     this.tiles[0][6].occupied = true;
-    this.lightPieces.push(new Piece('bishop', "1c" ,"light"));
+    this.lightPieces.push(new Piece('bishop', "1c" ,"light" , {row: 7, col: 2}));
     this.tiles[0][2].occupied = true;
-    this.lightPieces.push(new Piece('bishop', "1f" ,"light"));
+    this.lightPieces.push(new Piece('bishop', "1f" ,"light" , {row: 7, col: 5}));
     this.tiles[0][5].occupied = true;
-    this.lightPieces.push(new Piece('queen', "1d" ,"light"));
+    this.lightPieces.push(new Piece('queen', "1d" ,"light" , {row: 7, col: 3}));
     this.tiles[0][3].occupied = true;
-    this.lightPieces.push(new Piece('king', "1e" ,"light"));     
+    this.lightPieces.push(new Piece('king', "1e" ,"light" , {row: 7, col: 4}));     
     this.tiles[0][4].occupied = true;
   }
 
@@ -73,26 +73,26 @@ export default class Board {
     for(let i = 1; i <= 8; i++) 
     {
         let pos = 7 + String.fromCharCode(ascii);
-        let piece = new Piece('pawn', pos, "dark");
+        let piece = new Piece('pawn', pos, "dark", {row: 1, col: i -1});
         this.darkPieces.push(piece);
         this.tiles[6][i-1].occupied = true;
         ascii++;
     }
-    this.darkPieces.push(new Piece('rook', "8a" ,"dark"));
+    this.darkPieces.push(new Piece('rook', "8a" ,"dark", {row: 0, col: 0} ));
     this.tiles[7][0].occupied = true;
-    this.darkPieces.push(new Piece('rook', "8h" ,"dark"));
+    this.darkPieces.push(new Piece('rook', "8h" ,"dark", {row: 0, col: 7} ));
     this.tiles[7][7].occupied = true;
-    this.darkPieces.push(new Piece('knight', "8b" ,"dark"));
+    this.darkPieces.push(new Piece('knight', "8b" ,"dark", {row: 0, col: 1} ));
     this.tiles[7][1].occupied = true;
-    this.darkPieces.push(new Piece('knight', "8g" ,"dark"));
+    this.darkPieces.push(new Piece('knight', "8g" ,"dark", {row: 0, col: 6} ));
     this.tiles[7][6].occupied = true;
-    this.darkPieces.push(new Piece('bishop', "8c" ,"dark"));
+    this.darkPieces.push(new Piece('bishop', "8c" ,"dark", {row: 0, col: 2} ));
     this.tiles[7][2].occupied = true;
-    this.darkPieces.push(new Piece('bishop', "8f" ,"dark"));
+    this.darkPieces.push(new Piece('bishop', "8f" ,"dark", {row: 0, col: 5} ));
     this.tiles[7][5].occupied = true;
-    this.darkPieces.push(new Piece('queen', "8d" ,"dark"));
+    this.darkPieces.push(new Piece('queen', "8d" ,"dark", {row: 0, col: 3} ));
     this.tiles[7][3].occupied = true;
-    this.darkPieces.push(new Piece('king', "8e" ,"dark"));     
+    this.darkPieces.push(new Piece('king', "8e" ,"dark", {row: 0, col: 4} ));     
     this.tiles[7][4].occupied = true;
   }    
 

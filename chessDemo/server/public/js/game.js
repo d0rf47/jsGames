@@ -14,46 +14,40 @@ export default class Game
         this.board.initBoard();
         this.addEventListeners()            
     }
-
-    checkPotentialMoves(piece)
+    
+    checkPotentialMoves(currPiece)
     {
-        const currPiece = JSON.parse(window.atob(piece.getAttribute('data-object')));
-        console.log(currPiece)           
-        if(!this.validTurn(currPiece))
-            return;
-        else
-        {   
-            console.log('checking potential moves');
-            switch(currPiece.type)
-            {
-                case 'pawn':
-                    this.checkPawnMove(currPiece);
-                    break;
-                case 'rook':
-                    this.checkRookMove(currPiece);
-                    break;
-                case 'bishop':
-                    this.checkBishopMove(currPiece);
-                    break;
-                case 'knight':
-                    this.checkKnightMove(currPiece);
-                    break;
-                case 'queen':
-                    this.checkBishopMove(currPiece);
-                    this.checkRookMove(currPiece);
-                    break;
-                case 'king':
-                    this.checkKingMove(currPiece);
-                    break;
-            }
+        console.log('checking potential moves');
+        switch(currPiece.type)
+        {
+            case 'pawn':
+                this.checkPawnMove(currPiece);
+                break;
+            case 'rook':
+                this.checkRookMove(currPiece);
+                break;
+            case 'bishop':
+                this.checkBishopMove(currPiece);
+                break;
+            case 'knight':
+                this.checkKnightMove(currPiece);
+                break;
+            case 'queen':
+                this.checkBishopMove(currPiece);
+                this.checkRookMove(currPiece);
+                break;
+            case 'king':
+                this.checkKingMove(currPiece);
+                break;
         }
     }
+
     
     checkPawnMove(piece)
     {
         let tile = this.board.locateTile(piece.position);
-        console.log("pawn piece: ", piece)
-        console.log("pawn tile", tile);
+        // console.log("pawn piece: ", piece)
+        // console.log("pawn tile", tile);
         const row = tile.index.row;
         const col = tile.index.col;
         let potentialMoves = [];
@@ -84,10 +78,7 @@ export default class Game
             if(this.canMove(row + verTMovement, col + 1, piece ) && this.isOccupied(row + verTMovement, col + 1))                        
                 potentialMoves.push({row: tile.index.row + verTMovement, col : col + 1});            
         };
-        potentialMoves.forEach(m =>
-        {
-          this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
-        });
+        
         this.potentialMoves = potentialMoves;
     };
 
@@ -169,11 +160,7 @@ export default class Game
                 break;            
         }
 
-        //last thing in method
-        potentialMoves.forEach(m =>
-        {
-            this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
-        });
+        //last thing in method // concat req cause used for queen        
         this.potentialMoves = this.potentialMoves.concat(potentialMoves);   
     }
 
@@ -256,19 +243,15 @@ export default class Game
             }else
                 break;
         }
-        //last thing in method
-        potentialMoves.forEach(m =>
-        {
-            this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
-        });
+        //last thing in method        
         this.potentialMoves = this.potentialMoves.concat(potentialMoves);
     };
     //knight moves
     checkKnightMove(piece)
     {
         let tile = this.board.locateTile(piece.position);
-        console.log("knight piece: ", piece)
-        console.log("knight tile", tile);
+        // console.log("knight piece: ", piece)
+        // console.log("knight tile", tile);
         const row = tile.index.row;
         const col = tile.index.col;
         let potentialMoves = [];         
@@ -342,11 +325,7 @@ export default class Game
                     potentialMoves.push({row: row + verTMovement, col : col + horzMovment});                    
             }            
         }    
-        //last thing in method
-        potentialMoves.forEach(m =>
-        {
-            this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
-        });
+        //last thing in method        
         this.potentialMoves = potentialMoves;        
     };
 
@@ -354,43 +333,87 @@ export default class Game
     checkKingMove(piece)
     {
         let tile = this.board.locateTile(piece.position);
-        console.log("king piece: ", piece)
-        console.log("king tile", tile);
+        // console.log("king piece: ", piece)
+        // console.log("king tile", tile);
         const row = tile.index.row;
         const col = tile.index.col;
         let potentialMoves = [];   
+        
+        //forward
+        if(this.isInBound(row - 1) && this.canMove(row - 1, col, piece))
+            potentialMoves.push({row: row - 1, col : col});                   
+        //backward
+        if(this.isInBound(row + 1) && this.canMove(row + 1, col, piece))
+            potentialMoves.push({row: row + 1, col : col});                   
+        //left
+        if(this.isInBound(col - 1) && this.canMove(row, col - 1, piece))
+            potentialMoves.push({row: row, col : col - 1});
+        //right
+        if(this.isInBound(col + 1) && this.canMove(row, col + 1, piece))
+            potentialMoves.push({row: row, col : col + 1});                   
+        //front left
+        if(this.isInBound(row - 1) && this.isInBound(col - 1) && this.canMove(row - 1, col - 1, piece))
+            potentialMoves.push({row: row - 1, col : col - 1});
+        //front right
+        if(this.isInBound(row - 1) && this.isInBound(col + 1) && this.canMove(row - 1, col + 1, piece))
+            potentialMoves.push({row: row - 1, col : col + 1});
+        //back left
+        if(this.isInBound(row + 1) && this.isInBound(col - 1) && this.canMove(row + 1, col - 1, piece))
+            potentialMoves.push({row: row + 1, col : col - 1});
+        //back right
+        if(this.isInBound(row + 1) && this.isInBound(col + 1) && this.canMove(row + 1, col + 1, piece))
+            potentialMoves.push({row: row + 1, col : col + 1});
 
-        //forward check
-
-
-
-        //last thing in method
-        potentialMoves.forEach(m =>
-        {
-            this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
-        });
+        //last thing in method        
         this.potentialMoves = potentialMoves;        
     }
 
+    isCheck(piece)
+    {
+        console.log("checking for check!", piece);
+        
+
+    }
+
+
+    //event listener defs
+
+
+    displayPotentialMoves(piece)
+    {
+        this.potentialMoves = [];
+        const currPiece = JSON.parse(window.atob(piece.getAttribute('data-object')));
+        // console.log(currPiece)           
+        if(!this.validTurn(currPiece))
+            return;
+
+        this.checkPotentialMoves(currPiece);
+        this.potentialMoves.forEach(m =>
+        {
+            this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
+        });
+    }
+
+    //attached to each piece
     selectPieceToMove(event)
     {
         this.pieceToMove = event.target;
         const currPiece = JSON.parse(window.atob(this.pieceToMove.getAttribute('data-object')));
         if(!this.validTurn(currPiece))
             return;
-        
-        console.log(this.potentialMoves, this.pieceToMove)
+                
     }
 
+    //attached to each tile for onclick
     initMove(event)
     {
-        console.log("init move", event.target);
+        // console.log("init move", event.target);
         let targetIndex = 
         {
             row: parseInt(event.target.getAttribute('data-index').toString()[0]),
             col: parseInt(event.target.getAttribute('data-index').toString().substring(2))
         };
-        console.log(targetIndex);
+        // console.log(targetIndex);
         
         const currPiece = JSON.parse(window.atob(this.pieceToMove.getAttribute('data-object')));
         if(!this.validTurn(currPiece))
@@ -401,7 +424,7 @@ export default class Game
         this.updatePositions(event.target,currPiece)
         //move the pawn icon from its curr html elem to selected
         event.target.appendChild(this.pieceToMove);
-        
+        this.isCheck(currPiece);
         this.potentialMoves = [];
         this.lightTurn = !this.lightTurn;
     }
@@ -414,7 +437,7 @@ export default class Game
         //will need check for king stalemate
 
         //move board check to own method
-        console.log('updating pos', piece);
+        console.log('updating pos');
         console.log(targetElement, piece);
         let j = 0;
         let x = 0;    
@@ -428,15 +451,13 @@ export default class Game
             {
                 this.board.tiles[j][x].occupied = true;
                 if(targetElement.firstChild)
-                {
-                    //might need check for team
+                {                    
                     let pieceToRemove = JSON.parse(window.atob(targetElement.firstChild.getAttribute('data-object')));
                     console.log("peice to REMOVE",pieceToRemove);
                     targetElement.removeChild(targetElement.childNodes[0]);                                        
                 }
             }            
-            
-            
+                        
             //counter for array traversal
             x++;    
             if(i === 7 || i === 15 || i === 23 || i === 31 || i === 39 || i === 47 || i === 55 ) {
@@ -445,15 +466,19 @@ export default class Game
             }                  
         }
             piece.moved = true;
+            const dataIndex = targetElement.getAttribute('data-index');
+            piece.index = {row : parseInt(dataIndex[0]), col : parseInt(dataIndex[2]) };
             piece.position = targetElement.id;
             this.pieceToMove.setAttribute("data-object", window.btoa(JSON.stringify(piece)));
     }
 
+    //add all event listerns
     addEventListeners()
     {
         let pieces = document.getElementsByClassName('gamepiece');
         let tiles = document.getElementsByClassName('tile');
 
+        //tile event listener for onclick to initialize moves
         for(let i = 0; i < tiles.length; i++)
         {
             tiles[i].addEventListener("click", (event) =>
@@ -468,9 +493,10 @@ export default class Game
             {
                 if(type === 'mousedown')
                 {
+                    //provides move predictions 
                     pieces[i].addEventListener(type, (event) =>
                     {                        
-                        this.checkPotentialMoves(event.target);
+                        this.displayPotentialMoves(event.target);
                     }); 
                 }else if(type === 'mouseup')
                 {                                       
@@ -481,21 +507,21 @@ export default class Game
                         // console.log(elems)                 
                         for (let i = elems.length - 1; i >= 0; i--)
                         {                            
-                            elems[i].classList.remove('overlay-effect');                            
-                        }
+                            elems[i].classList.remove('overlay-effect');                                                        
+                        }                        
                     });                                         
                 }else if(type === 'click')
-                {
+                {   //selected the piece to be moved
                     pieces[i].addEventListener(type, (event) =>
                     {
                         this.selectPieceToMove(event);
                     });
-
                 }
             });
         }
     }
 
+    //helpers
     validTurn(currPiece)
     {
         if(this.lightTurn && currPiece.color !== 'light')
@@ -518,4 +544,11 @@ export default class Game
             return true;
         return false;
     };
+
+    isInBound(x)
+    {
+        if(x <= 7 && x >= 0)
+            return true;
+        return false;
+    }
 }

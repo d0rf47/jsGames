@@ -2,13 +2,15 @@ export default class Piece {
     type = "";
     color = "";
     position = "";
+    index = {};
     icon = "";    
     moved = false;
     alive = true;
-    constructor(type, position, color) {
+    constructor(type, position, color, index) {
       this.position = position;
       this.type = type;
       this.color = color;
+      this.index = index;
       this.initPiece();
     }
   
