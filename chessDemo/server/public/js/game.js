@@ -5,40 +5,45 @@ export default class Game
 {
     board;
     lightTurn = true;
+    inCheck = false;
+    inCheckMate = false;
+    inStaleMate = false;
     pieceToMove = undefined;
+    lastPiece = undefined;
     potentialMoves = [];
-
+    opposingMove = []
+    currentTeam = 
+    {
+        color : 'light',
+        pieces : [],
+        inCheck : false
+    };
     initGame()
     {
         this.board = new Board();
-        this.board.initBoard();
-        this.addEventListeners()            
+        this.board.initBoard();        
+        this.addEventListeners();
+        this.currentTeam.pieces = this.board.lightPieces;
     }
     
     checkPotentialMoves(currPiece)
     {
-        console.log('checking potential moves');
+        // console.log('checking potential moves', currPiece);                
         switch(currPiece.type)
         {
             case 'pawn':
-                this.checkPawnMove(currPiece);
-                break;
+                return this.checkPawnMove(currPiece);                
             case 'rook':
-                this.checkRookMove(currPiece);
-                break;
+                return this.checkRookMove(currPiece);                
             case 'bishop':
-                this.checkBishopMove(currPiece);
-                break;
+                return this.checkBishopMove(currPiece);                
             case 'knight':
-                this.checkKnightMove(currPiece);
-                break;
+                return this.checkKnightMove(currPiece);                
             case 'queen':
-                this.checkBishopMove(currPiece);
-                this.checkRookMove(currPiece);
-                break;
+                let potentialMoves = this.checkBishopMove(currPiece);                
+                return potentialMoves.concat(this.checkRookMove(currPiece));                
             case 'king':
-                this.checkKingMove(currPiece);
-                break;
+                return this.checkKingMove(currPiece);                
         }
     }
 
@@ -79,7 +84,7 @@ export default class Game
                 potentialMoves.push({row: tile.index.row + verTMovement, col : col + 1});            
         };
         
-        this.potentialMoves = potentialMoves;
+        return potentialMoves;
     };
 
     checkRookMove(piece)
@@ -161,7 +166,7 @@ export default class Game
         }
 
         //last thing in method // concat req cause used for queen        
-        this.potentialMoves = this.potentialMoves.concat(potentialMoves);   
+        return potentialMoves;
     }
 
     //Check Bishop Moves
@@ -244,7 +249,7 @@ export default class Game
                 break;
         }
         //last thing in method        
-        this.potentialMoves = this.potentialMoves.concat(potentialMoves);
+        return potentialMoves;
     };
     //knight moves
     checkKnightMove(piece)
@@ -326,7 +331,7 @@ export default class Game
             }            
         }    
         //last thing in method        
-        this.potentialMoves = potentialMoves;        
+        return potentialMoves;
     };
 
     //king
@@ -365,14 +370,75 @@ export default class Game
             potentialMoves.push({row: row + 1, col : col + 1});
 
         //last thing in method        
-        this.potentialMoves = potentialMoves;        
+        return potentialMoves; 
     }
 
-    isCheck(piece)
-    {
-        console.log("checking for check!", piece);
+    inCurrCheck()
+    {        
+        //need to used last piece position to predict possible moves, only moves that block 
+        // last pieces potential moves where index has a king can be a valid move, 
+        //king can only move to a spot that is not in the possible moves of the last piece
+        let stillInCheck = false;
+        let currKing = this.board.lightPieces.filter((p) => p.type === 'king')[0];                           
+        if(this.currentTeam.color === 'dark')
+        {
+            currKing = this.board.darkPieces.filter((p) => p.type === 'king')[0];      
+            this.board.lightPieces.forEach((p)=>
+            {
+                this.checkPotentialMoves(p);
+                for(let pm of this.potentialMoves)
+                {
+                    if(pm.row === currKing.row && pm.col === currKing.col)
+                    {
+                        this.inCheck = true;
+                        break;
+                    }                    
+                };
+            })
+        }else
+        {            
+            this.board.darkPieces.forEach((p)=>
+            {
+                this.checkPotentialMoves(p);
+                for(let pm of this.potentialMoves)
+                {
+                    if(pm.row === currKing.row && pm.col === currKing.col)
+                    {
+                        this.inCheck = true;
+                        break;
+                    }                    
+                };
+            });
+        }
+        this.potentialMoves = [];                
         
+    }
 
+    isOpponentCheck(piece)
+    {
+        
+        let potentialMoves = this.checkPotentialMoves(piece);
+        let opposingKing = this.board.lightPieces.filter((p) => p.type === 'king')[0];
+        if(piece.color === 'light')            
+            opposingKing = this.board.darkPieces.filter((p) => p.type === 'king')[0];
+        
+        // console.log(this.potentialMoves);
+        console.log('opposing king', opposingKing);
+        potentialMoves.forEach((pm) =>
+        {
+            if(pm.row === opposingKing.index.row && pm.col === opposingKing.index.col)
+                this.inCheck = true;
+        })
+
+        if(this.inCheck)
+            opposingKing.icon.classList.add('check', 'checkPulse');
+    }
+
+    removeCheck()
+    {
+        const currKing = this.currentTeam.pieces.filter((p) => p.type === 'king')[0];
+        currKing.icon.classList.remove('check', 'checkPulse');
+        this.inCheck = false;
     }
 
 
@@ -381,13 +447,61 @@ export default class Game
 
     displayPotentialMoves(piece)
     {
-        this.potentialMoves = [];
+        let potentialMoves = []
         const currPiece = JSON.parse(window.atob(piece.getAttribute('data-object')));
         // console.log(currPiece)           
         if(!this.validTurn(currPiece))
             return;
 
-        this.checkPotentialMoves(currPiece);
+        potentialMoves = this.checkPotentialMoves(currPiece);
+        //add filter  here to check for moves in cases of king in check
+        if(this.currentTeam.inCheck)
+        {            
+            // console.log("last piece", this.lastPiece);
+            // console.log("curr piece", currPiece);
+            let oppPotentialMoves = this.checkPotentialMoves(this.lastPiece);
+            // console.log("curr Moves", potentialMoves);
+            // console.log("last piece pot moves", oppPotentialMoves);
+            if(currPiece.type === 'king')
+            {
+                oppPotentialMoves.forEach((oPm =>
+                {
+                    for(let i = 0; i < potentialMoves.length; i++) 
+                    {
+                        if(oPm.col === potentialMoves[i].col && oPm.row === potentialMoves[i].row)
+                        {
+                            potentialMoves.splice(i,1);
+                            i--;//decrement to protect loop 
+                        }
+                    }
+                }))
+            }else
+            {
+                let tempMoves = [];
+                let found = false;
+                for(let i = 0; i < potentialMoves.length && !found; i++ )
+                {
+                    for(let oPm of oppPotentialMoves)
+                    {                                        
+                        if(oPm.col === potentialMoves[i].col && oPm.row === potentialMoves[i].row ) //need to check if is in path of king
+                        {
+                            if(this.inPathOfKing(potentialMoves[i], currPiece))
+                            {
+                                console.log('found');
+                                found = true;                                                                
+                                tempMoves.push(potentialMoves[i]);
+                            }                                                                             
+                        }                    
+                        if(found)
+                            break;
+                    };
+                }         
+                //need to add 1 more check for if the potential move can capture the piece causing
+                //checkmate
+                potentialMoves = tempMoves;
+            }            
+        }
+        this.potentialMoves = potentialMoves;
         this.potentialMoves.forEach(m =>
         {
             this.board.tiles[m.row][m.col].element.classList.add('overlay-effect');
@@ -398,10 +512,11 @@ export default class Game
     selectPieceToMove(event)
     {
         this.pieceToMove = event.target;
+        // console.log("piece to move", this.pieceToMove);
+        // this.pieceToMove.icon = event.target;
         const currPiece = JSON.parse(window.atob(this.pieceToMove.getAttribute('data-object')));
         if(!this.validTurn(currPiece))
-            return;
-                
+            return;                
     }
 
     //attached to each tile for onclick
@@ -424,9 +539,8 @@ export default class Game
         this.updatePositions(event.target,currPiece)
         //move the pawn icon from its curr html elem to selected
         event.target.appendChild(this.pieceToMove);
-        this.isCheck(currPiece);
-        this.potentialMoves = [];
-        this.lightTurn = !this.lightTurn;
+        this.isOpponentCheck(currPiece);       
+        this.swapCurrentTeam();   
     }
 
     //need to update arrays of positions for pieces and track is still on board
@@ -470,6 +584,11 @@ export default class Game
             piece.index = {row : parseInt(dataIndex[0]), col : parseInt(dataIndex[2]) };
             piece.position = targetElement.id;
             this.pieceToMove.setAttribute("data-object", window.btoa(JSON.stringify(piece)));
+            this.lastPiece = piece;
+            if(this.inCheck)
+            {
+                this.removeCheck();
+            }
     }
 
     //add all event listerns
@@ -550,5 +669,56 @@ export default class Game
         if(x <= 7 && x >= 0)
             return true;
         return false;
+    };
+
+    swapCurrentTeam()
+    {
+
+        this.inCurrCheck(this.c);
+        if(this.currentTeam.color === 'light')
+        {
+            this.currentTeam.color = 'dark';
+            this.currentTeam.pieces = this.board.darkPieces;             
+        }else
+        {
+            this.currentTeam.color = 'light';
+            this.currentTeam.pieces = this.board.lightPieces; 
+        }
+        this.currentTeam.inCheck = this.inCheck;
+        this.lightTurn = !this.lightTurn;
+        this.potentialMoves = [];
+    }
+
+    inPathOfKing(potentialMove, currPiece)
+    {
+        let tempIdx = potentialMove;
+        console.log("last piece", this.lastPiece);
+        // console.log("curr piece", currPiece);
+        console.log("my move",potentialMove);        
+        console.log(this.board.tiles[potentialMove.row][potentialMove.col]);
+        //simulate the move and re check path
+        this.board.tiles[potentialMove.row][potentialMove.col].occupied = true;
+        let tempPiece = document.getElementById(currPiece.position).firstChild.cloneNode();        
+        tempPiece.style.display = 'none';
+        let tempDestination = this.board.tiles[potentialMove.row][potentialMove.col].element;
+        tempDestination.appendChild(tempPiece);
+        let oppPotentialMoves = this.checkPotentialMoves(this.lastPiece);
+        for(let oPm of oppPotentialMoves)
+        {
+
+            if(this.board.tiles[oPm.row][oPm.col].element.firstChild)
+            {
+                let elem = this.board.tiles[oPm.row][oPm.col].element.firstChild
+                console.log(elem)
+                if(elem.getAttribute('data-type') === 'king')
+                    return false;
+            }
+        };
+
+        //reset all changes!
+        tempDestination.removeChild(tempDestination.childNodes[0]);    
+        this.board.tiles[potentialMove.row][potentialMove.col].occupied = false;
+
+        return true;
     }
 }

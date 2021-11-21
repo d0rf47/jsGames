@@ -21,13 +21,49 @@ body {
     color: whitesmoke;
 }
 
+.check
+{
+    color: red;
+}
+
 .fas
 {
     cursor: pointer;    
 }
 
 
-.overlay-effect {    
+.overlay-effect 
+{    
     transition: .5s ease;
     background-color: rgba(259, 67, 95, 0.7);    
+}
+
+.checkPulse {
+    animation:checkPulse 5s ease infinite;
+  }
+  @keyframes checkPulse {
+    0% {
+      transform:scale(1);
+    }
+    5% {
+      transform:scale(1.25);
+    }
+    20% {
+      transform:scale(1);
+    }
+    30% {
+      transform:scale(1);
+    }
+    35% {
+      transform:scale(1.25);
+    }
+    50% {
+      transform:scale(1);
+    }
+    55% {
+      transform:scale(1.25);
+    }
+    70% {
+      transform:scale(1);
+    }
   }

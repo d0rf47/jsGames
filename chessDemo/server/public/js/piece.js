@@ -21,7 +21,8 @@ export default class Piece {
       elem.setAttribute("data-position", this.position);
       elem.setAttribute("data-type", this.type);
       elem.setAttribute("data-team", this.color);
-      elem.setAttribute("data-object", window.btoa(JSON.stringify(this)))      
+      this.icon = elem;
+      elem.setAttribute("data-object", window.btoa(JSON.stringify(this)));
       switch (this.type) {
         case "pawn":
           elem.classList.add("fas", "fa-chess-pawn");
@@ -42,7 +43,7 @@ export default class Piece {
           elem.classList.add("fas", "fa-chess-king");
           break;
       }
-      this.icon = elem;
+      this.icon = elem;      
       tile.append(this.icon);
     }   
     
