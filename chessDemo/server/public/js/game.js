@@ -482,7 +482,11 @@ export default class Game
                 for(let i = 0; i < potentialMoves.length && !found; i++ )
                 {
                     for(let oPm of oppPotentialMoves)
-                    {                                        
+                    {                                       
+                        if(potentialMoves[i].col === this.lastPiece.index.col && potentialMoves[i].row === this.lastPiece.index.row) 
+                        {
+                            tempMoves.push(potentialMoves[i]);
+                        }
                         if(oPm.col === potentialMoves[i].col && oPm.row === potentialMoves[i].row ) //need to check if is in path of king
                         {
                             if(this.inPathOfKing(potentialMoves[i], currPiece))
